@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--Import css files-->
+    <link rel="stylesheet" href="http://localhost:4000/vendors/css/bootstrap.min.css">
+    <!--Import js files-->
+    <script src="vendors/js/jquery-3.2.1.min.js"></script>
+    <script src="vendors/js/bootstrap.min.js"></script>
+    <script src="vendors/js/angular.min.js"></script>
+    <script src="vendors/js/angular-route.js"></script>
+    <script src="vendors/js/ngStorage.min.js"></script>
+    <script src="vendors/js/angular-ui-router.min.js"></script>
+    <!--Angular main config-->
+    <script src="app.modules.js"></script>
+    <script src="app.config.js"></script>
+    <script src="app.run.js"></script>
+    <!--Angular controllers-->
+    <script src="controller/main.controller.js"></script>
+    <!--Angular Services-->
+    <script src="service/page.refresh.service.js"></script>
+    <!--Base URL-->
+    <base href="/">
+</head>
+<body ng-app="Chat-Head-App" ng-controller="MainController">
+    <div ng-view></div>
+</body>
+</html>
