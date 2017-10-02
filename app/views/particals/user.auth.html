@@ -1,4 +1,3 @@
-<h1>asdasdasdasd</h1>
 <div ng-controller="UserAuthController" ng-init="onInit()">
     <script src="assets/js/user.auth.js"></script>
     <div id="fullscreen_bg" class="fullscreen_bg"></div>
@@ -59,21 +58,62 @@
                                     </div>
                                 </form>
                                 <form id="register-form" action="#" method="post" role="form" style="display: none;">
-
-                                    <!--Register Username-->
+                                    <!--Email-->
                                     <div class="form-group">
-                                        <label for="reg_username">Username</label>
-                                        <input type="text" name="username" id="reg_username" ng-model="reg_username"
-                                               tabindex="1" class="form-control" placeholder="Username" value="" ng-change="errorReset('reg_username_error')">
-                                        <small class="help-block" ng-show="isSignUpClicked" style="color: red; float: right">{{reg_username_error}}</small>
+                                        <label for="reg_email">Email</label>
+                                        <input type="text" name="email" ng-model="reg_email" id="reg_email"
+                                               tabindex="1" class="form-control" placeholder="Email" ng-change="errorReset('reg_email_error')" value="">
+                                        <small class="help-block" ng-show="errorObjectArray.reg_email_error.view_status" style="color: red; float: right">
+                                            {{errorObjectArray.reg_email_error.value}}</small>
                                     </div>
+
+                                    <div class="col-xs-12">
+                                        <!--Firstname-->
+                                        <div class="form-group col-xs-6">
+                                            <label for="reg_firstname">Firstname</label>
+                                            <input type="text" name="firstname" ng-model="reg_firstname" id="reg_firstname"
+                                                   tabindex="1" class="form-control" placeholder="First name" ng-change="errorReset('reg_firstname_error')" value="">
+                                            <small class="help-block" ng-show="errorObjectArray.reg_firstname_error.view_status" style="color: red; float: right">
+                                                {{errorObjectArray.reg_firstname_error.value}}</small>
+                                        </div>
+
+                                        <!--Lastname-->
+                                        <div class="form-group col-xs-6">
+                                            <label for="reg_lastname">Lastname</label>
+                                            <input type="text" name="lastname" ng-model="reg_lastname" id="reg_lastname"
+                                                   tabindex="1" class="form-control" placeholder="Last name" ng-change="errorReset('reg_lastname_error')" value="">
+                                            <small class="help-block" ng-show="errorObjectArray.reg_lastname_error.view_status" style="color: red; float: right">
+                                                {{errorObjectArray.reg_lastname_error.value}}</small>
+                                        </div>
+                                    </div>
+
+                                    <!--CheckBox-->
+                                    <div class="col-xs-12">
+                                        <fieldset class="checkboxes col-xs-6" style="text-align:right">
+                                            <label checkbox="isMale" style="width: 100px; text-align: left">
+                                                <input type="checkbox" name="reg_male" id="reg_male"
+                                                       ng-model="isMale">
+                                                Male
+                                            </label>
+                                        </fieldset>
+                                        <fieldset class="checkboxes col-xs-6">
+                                            <label checkbox="!isMale" style="width: 100px; text-align: left">
+                                                <input type="checkbox"
+                                                       ng-model="isMale">
+                                                Female
+                                            </label>
+                                        </fieldset>
+                                    </div>
+
 
                                     <!--Register Password-->
                                     <div class="form-group">
                                         <label for="reg_password">Password</label>
                                         <input type="password" name="password" id="reg_password" ng-model="reg_password"
                                                tabindex="2" class="form-control" placeholder="Eg: aAa@123456789" ng-change="errorReset('reg_password_error')">
-                                        <small class="help-block" ng-show="isSignUpClicked" style="color: red; float: right">{{reg_password_error}}</small>
+                                        <small class="help-block" ng-show="errorObjectArray.reg_password_error.view_status" style="color: red; float: right">
+                                            {{errorObjectArray.reg_password_error.value}}
+                                        </small>
                                     </div>
 
                                     <!--Confirm Password-->
@@ -81,14 +121,13 @@
                                         <label for="confirm-password">Confirm password</label>
                                         <input type="password" name="confirm-password" id="confirm-password" ng-model="reg_re_password"
                                                tabindex="2" class="form-control" placeholder="Confirm Password" ng-change="rePasswordValidate()">
-                                        <small class="help-block" style="color: red; float: right">{{reg_re_password_error}}</small>
+                                        <small class="help-block" style="color: red; float: right" ng-show="errorObjectArray.reg_re_password_error.view_status">
+                                            {{errorObjectArray.reg_re_password_error.value}}</small>
                                     </div>
 
                                     <div class="col-xs-12 text-center">
                                         <small class="help-block col-xs-12" ng-show="isSignUpClicked && reg_error_flag"
                                                style="color: red; float: right">{{reg_error_messages}}</small>
-                                        <small class="text-info col-xs-12" ng-show="isSignUpClicked && sign_up_flag"
-                                               style="float: right; margin-bottom: 8px">Signing up.. Please wait..</small>
                                     </div>
 
                                     <!--Signup button-->
