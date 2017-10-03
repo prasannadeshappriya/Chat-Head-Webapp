@@ -22,5 +22,13 @@ module.exports = {
                 sex: user.gender
             }
         })
+    },
+
+    userFindOne: async function(user){
+        return await model.users.findOne({
+            where: {
+                email: user.email
+            }
+        })
     }
 };

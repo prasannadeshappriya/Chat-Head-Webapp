@@ -1,7 +1,9 @@
 /**
  * Created by prasanna_d on 9/26/2017.
  */
-app.controller('UserAuthController',['$scope',function ($scope) {
+app.controller('UserAuthController',[
+    '$scope', '$http', 'host_url', 'AuthService', '$location',
+    function ($scope, $http, host_url, AuthService, $location) {
     //Male, Female option configure
     $scope.isMale = true;
 
@@ -14,7 +16,10 @@ app.controller('UserAuthController',['$scope',function ($scope) {
         reg_lastname_error: {value: '', view_status: false},
         reg_email_error: {value: '', view_status: false},
         reg_password_error: {value: '', view_status: false},
-        reg_re_password_error: {value: '', view_status: false}
+        reg_re_password_error: {value: '', view_status: false},
+        login_email_error: {value: '', view_status: false},
+        login_password_error: {value: '', view_status: false},
+        login_error_messages:{value: '', view_status: false}
     };
     //Show hide error messages
     $scope.errorReset = function (type) {
@@ -35,6 +40,15 @@ app.controller('UserAuthController',['$scope',function ($scope) {
                 }
             });
     }
+    function hideError(error_code) {
+        Object.keys($scope.errorObjectArray)
+            .forEach(function (key) {
+                if(key===error_code){
+                    $scope.errorObjectArray[key].value='';
+                    $scope.errorObjectArray[key].view_status=false;
+                }
+            });
+    }
     //Initializing when refresh---------------------------------------
     $scope.onInit = function () {
         console.log('Initialize User Auth View');
@@ -44,19 +58,70 @@ app.controller('UserAuthController',['$scope',function ($scope) {
     $scope.rePasswordValidate = function () {
         if(typeof $scope.reg_re_password==='undefined' ||
             $scope.reg_re_password===''){
-                console.log('here');
-                $scope.errorObjectArray.reg_re_password_error.value = '';
-                $scope.errorObjectArray.reg_re_password_error.view_status = false; return;}
+                hideError('reg_re_password_error'); return;}
         if($scope.reg_password!==$scope.reg_re_password){
-            $scope.errorObjectArray.reg_re_password_error.value='Confirmed password is not match with your password';
-            $scope.errorObjectArray.reg_re_password_error.view_status = true;
+            showError('reg_re_password_error', 'Confirmed password is not match with your password');
         }else{
-            $scope.errorObjectArray.reg_re_password_error.value = '';
-            $scope.errorObjectArray.reg_re_password_error.view_status = false;}
+            hideError('reg_re_password_error');}
     };
 
-    //Validate password
-    async function validatePassword() {
+        $scope.userLogOut = function () {
+            AuthService.logout();
+            console.log('test');
+            $http.defaults.headers.common.authorization = '';
+        };
+
+    //Button Key press functions--------------------------------------
+    $scope.btnSignIn = async function () {
+        if(await validateLogin()) {
+            try {
+                let result = await $http({
+                    method: "POST",
+                    url: host_url + "users/login",
+                    data: {
+                        user_email: $scope.login_email,
+                        user_password: $scope.login_password
+                    }
+                });
+                console.log(result);
+                if (result.status === 200) {
+                    AuthService.userLogin(
+                        result.data.token, result.data.user, function(status){
+                            if(status){
+                                console.log('Login success');
+                                AuthService.setIsLogin(true);
+                                $location.path('/home');
+                                $scope.$apply();
+                            }
+                            else{console.log('Error writing to the local storage')}
+                        });
+                }else{
+                    showError('login_error_messages', 'Something went wrong, Please try again!');
+                    $scope.$apply();
+                }
+            }catch (err){
+                if(err.status===401) {
+                    showError('login_error_messages', 'Invalid user credentials');
+                    $scope.$apply();
+                }else if(err.status===400){
+                    showError('login_error_messages', 'Email address is invalid or not exist!');
+                    $scope.$apply();
+                }else{
+                    showError('login_error_messages', 'Something went wrong, Please try again!');
+                    $scope.$apply();
+                }
+            }
+        }
+    };
+    $scope.btnSignUp = async function () {
+        $scope.isSignInClicked = true;
+        if(await validateRegister()){
+            console.log('test');
+        }
+    };
+
+    //Data validations------------------------------------------------
+    async function validateRegister() {
         let con = true;
         if (typeof $scope.reg_email === 'undefined' || $scope.reg_email.replace(" ", "") === '') {
             showError('reg_email_error', '* Email is required');
@@ -82,12 +147,10 @@ app.controller('UserAuthController',['$scope',function ($scope) {
             }
             //Password confirmation validation
             if($scope.reg_password!==$scope.reg_re_password){
-                $scope.errorObjectArray.reg_re_password_error.value='Confirmed password is not match with your password';
-                $scope.errorObjectArray.reg_re_password_error.view_status = true;
+                showError('reg_re_password_error', 'Confirmed password is not match with your password');
                 return false;
             }else{
-                $scope.errorObjectArray.reg_re_password_error.value='';
-                $scope.errorObjectArray.reg_re_password_error.view_status = false;
+                hideError('reg_re_password_error');
             }
             //Validate for invalid passwords
             return true;
@@ -95,14 +158,17 @@ app.controller('UserAuthController',['$scope',function ($scope) {
         return false;
     }
 
-    //Button Key press functions--------------------------------------
-    $scope.btnSignIn = async function () {
-
-    };
-    $scope.btnSignUp = async function () {
-        $scope.isSignInClicked = true;
-        if(await validatePassword()){
-            console.log('test');
+    async function validateLogin() {
+        let con = true;
+        if (typeof $scope.login_email === 'undefined' || $scope.login_email.replace(" ", "") === '') {
+            showError('login_email_error', '* Email is required');
+            con = false;
         }
-    };
+        if (typeof $scope.login_password === 'undefined' || $scope.login_password.replace(" ", "") === '') {
+            showError('login_password_error', '* Password name is required');
+            con = false;
+        }
+        hideError('login_error_messages');
+        return con;
+    }
 }]);
