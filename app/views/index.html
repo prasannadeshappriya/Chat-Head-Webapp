@@ -6,6 +6,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <!--Import css files-->
     <link rel="stylesheet" href="vendors/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendors/css/angular-material.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/reg.login.form.css">
     <!--Import js files-->
@@ -15,6 +16,9 @@
     <script src="vendors/js/angular-route.js"></script>
     <script src="vendors/js/ngStorage.min.js"></script>
     <script src="vendors/js/angular-ui-router.min.js"></script>
+    <script src="vendors/js/angular-aria.min.js"></script>
+    <script src="vendors/js/angular-animate.min.js"></script>
+    <script src="vendors/js/angular-material.js"></script>
     <!--Import CSS Less Javascript files and Less files-->
     <link rel="stylesheet/less" href="assets/less/main.less">
     <script src="vendors/js/less.min.js"></script>
@@ -26,9 +30,11 @@
     <script src="controller/main.controller.js"></script>
     <script src="controller/user.auth.controller.js"></script>
     <script src="controller/home.controller.js"></script>
+    <script src="controller/profile.controller.js"></script>
     <!--Angular Services-->
     <script src="service/page.refresh.service.js"></script>
     <script src="service/auth.service.js"></script>
+    <script src="service/user.info.service.js"></script>
     <!--Angular Directives-->
     <script src="directives/checkbox.js"></script>
     <!--Base URL-->
@@ -37,7 +43,7 @@
 
 
 <body ng-app="Chat-Head-App" ng-controller="MainController">
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default" ng-show="isAuthanticated">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -47,10 +53,10 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="#">
-                    <img src="../app/assets/img/chat-bot-logo.png" style="width: 160px; margin-top: -15px"></a>
+                    <img src="assets/img/chat_head_logo_banner.png" style="width: 190px; margin-top: -25px"></a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav" style="margin-left: 50px">
+                <ul class="nav navbar-nav">
                     <li class="navItem"><a href="" ng-click="">Test</a></li>
                     <li class="navItem"><a href="" ng-click="">Test</a></li>
                     <li class="dropdown navItem">
@@ -64,15 +70,10 @@
                     <li class="navItem"><a href="" ng-click="">Test</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li id="navChatWithBot">
-                        <a href="" data-toggle="modal" data-target="#modalChatWithBot" >
-                            <img src="../app/assets/img/bot_icon.png" style="width: 40px; margin: -10px 10px -10px 10px;">
-                        </a>
-                    </li>
                     <li class="dropdown navItem">
                         <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <img src="../app/assets/img/default_profile_pic.png" style="width: 30px; margin: -10px 10px -10px 21px; right: 0">
-                            {{admin_user_name}} <span class="caret"></span></a>
+                            <img src="assets/img/profile/default_profile_pic.png" style="width: 30px; margin: -10px 10px -10px 21px; right: 0">
+                            {{first_name}} {{last_name}} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="">Test</a></li>
                             <li><a href="" ng-click="">Test</a></li>
@@ -90,7 +91,7 @@
     <footer class="footer container-fluid">
         <div class="col-xs-12" style="margin-top: 40px">
             <div class="col-xs-4">
-                <img src="../app/assets/img/chat-bot-logo.png" style="width: 160px; margin-top: -15px">
+                <img src="assets/img/chat_head_logo.png" style="width: 100px; margin-top: -15px">
                 <p class="footer-links">
                     <a href="" ng-click="showView('intent')">Intent</a>·
                     <a href="" ng-click="showView('entity')">Entity</a>·
@@ -104,7 +105,7 @@
             <div class="col-xs-4">
                 <div class="col-xs-12">
                     <div class="col-lg-4">
-                        <img src="../app/assets/img/location.png" style="width: 30px; float: right"></a>
+                        <img src="assets/img/footer/location.png" style="width: 30px; float: right"></a>
                     </div>
                     <div class="col-lg-8">
                         <p ><span>21 Revolution Street</span> <br>Paris, France</p>
@@ -112,7 +113,7 @@
                 </div>
                 <div class="col-xs-12">
                     <div class="col-lg-4">
-                        <img src="../app/assets/img/phone.png" style="width: 30px; float: right"></a>
+                        <img src="assets/img/footer/phone.png" style="width: 30px; float: right"></a>
                     </div>
                     <div class="col-lg-8">
                         <p>+1 555 123456</p>
