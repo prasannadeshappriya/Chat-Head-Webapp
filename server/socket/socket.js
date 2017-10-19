@@ -4,6 +4,11 @@
 
 const users = [];
 const clients = [];
+const rooms = [
+    {name: 'public Room', roomId: 1, users: [], messages: []},
+    {name: 'prasanna', roomId: 126, users: [], messages: []}
+];
+
 module.exports = [
     function (io) {
         io.on('connection', async function(socket){
@@ -27,9 +32,20 @@ module.exports = [
             //send broadcast connect message
             let userName = status[1].first_name + ' ' + status[1].last_name;
             io.sockets.emit('user', JSON.stringify(clients));
+            io.sockets.emit('room_update', JSON.stringify(rooms));
 
             socket.on('message', function(msg){
                 io.sockets.emit('message', msg);
+            });
+
+            socket.on('room_create', function(msg){
+                let room = JSON.parse(msg);
+                let con = true;
+                for(let i=0; i<rooms.length; i++){
+                    if(rooms[i].roomId===room.roomId){con = false;}
+                }
+                if(con){rooms.push(room);}
+                io.sockets.emit('room_create', JSON.stringify(rooms));
             });
         });
     }, {

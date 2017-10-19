@@ -5,7 +5,9 @@ app.controller('HomeController',[
     '$scope', 'AuthService',
     function ($scope, AuthService) {
         let homeCtrl = this;
-        let months = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+        let months = ["Jan", "Feb", "March", "April",
+            "May", "June", "July", "Aug",
+            "Sept", "Oct", "Nov", "Dec"];
 
         //get current user object
         let user = AuthService.getUser();
@@ -16,13 +18,34 @@ app.controller('HomeController',[
         socket.on('message', function (msg) {
             try{
                 let message = JSON.parse(msg);
-                message._id = ((homeCtrl.messages.length) + 1);
+                message._id = ((homeCtrl.room[getRoomIndex(message.roomId)].messages.length) + 1);
                 if(message.authorId!==user.user.id) {
-                    homeCtrl.messages.push(message);
+                    homeCtrl.room[getRoomIndex(message.roomId)].messages.push(message);
                     $scope.$apply();
                 }
             }catch (err){
                 console.log('An error occurs while parsing the message, [msg: ' + msg + ']')
+            }
+        });
+
+        socket.on('room_update', function (msg) {
+            try{
+                homeCtrl.roomAll = JSON.parse(msg);
+                $scope.$apply();
+            }catch (err){
+                console.log('An error occurs while parsing the rooms, [msg: ' + msg + ']')
+            }
+        });
+
+        socket.on('room_create', function (msg) {
+            console.log(msg);
+            console.log('test');
+            try{
+                homeCtrl.roomAll = [];
+                homeCtrl.roomAll = JSON.parse(msg);
+                $scope.$apply();
+            }catch (err){
+                console.log('An error occurs while parsing the rooms, [msg: ' + msg + ']')
             }
         });
 
@@ -40,10 +63,10 @@ app.controller('HomeController',[
                 }
                 homeCtrl.allusers = userList;
                 let index = 1;
-                homeCtrl.users = [];
+                homeCtrl.room[getRoomIndex(1)].users = [];
                 Object.keys(homeCtrl.allusers)
                     .forEach(function (key) {
-                        homeCtrl.users.push({
+                        homeCtrl.room[getRoomIndex(1)].users.push({
                             _id: index,
                             imageUrl: 'https://robohash.org/aa!',
                             username: homeCtrl.allusers[key].username,
@@ -52,36 +75,60 @@ app.controller('HomeController',[
                         index = index + 1;
                     });
             }catch (err){
-                console.log('An error occurs while parsing user object, [user: ' + msg + ']')
+                console.log('An error occurs while parsing user object, [user: ' + arrUser + ']')
             }
         });
 
+        homeCtrl.createNewRoom = function () {
+            console.log(user);
+            let newRoom = {
+                name: 'movies',
+                roomId: 245,
+                users: [{
+                    _id: 1,
+                    fullname: user.user.first_name + ' ' + user.user.last_name,
+                    imageUrl: 'https://robohash.org/aa!',
+                    username: user.user.email
+                }],
+                messages:[]
+            };
+            homeCtrl.room.push(newRoom);
+            socket.emit('room_create',JSON.stringify(newRoom));
+        };
 
         //User input message
         homeCtrl.newMessage = '';
 
         //All users of the room
-        homeCtrl.users = [];
+        //homeCtrl.users = [];
+
+        homeCtrl.roomAll = [];
 
         //Get all rooms
-        homeCtrl.room = {
-            name: 'public',
-            roomId: 124
-        };
+        homeCtrl.room = [
+            {name: 'public Room', roomId: 1, users: [], messages: []},
+            {name: 'prasanna', roomId: 126, users: [], messages: []}
+        ];
 
         //Store all messages
-        homeCtrl.messages = [];
+        //homeCtrl.messages = [];
 
         homeCtrl.allusers = [];
 
+        let getRoomIndex = function (id) {
+            for(let i=0; i<homeCtrl.room.length; i++){
+                if(homeCtrl.room[i].roomId===id){return i}
+            }
+            return -1;
+        };
 
 
-        homeCtrl.createMessage = function () {
+        homeCtrl.createMessage = function (room_id) {
             if(typeof homeCtrl.newMessage!=='undefined' &&
                 homeCtrl.newMessage !==''){
                 let userMessage = homeCtrl.newMessage;
 
-                console.log('Should sent message: "' + userMessage + '"');
+                console.log('Should sent message: "' + userMessage + '", [room_id: ' + room_id + ']');
                 homeCtrl.newMessage = '';
 
                 let currentDate = new Date();
@@ -90,17 +137,17 @@ app.controller('HomeController',[
                     currentDate.getHours() + ":" +
                     currentDate.getMinutes();
 
-                let count = homeCtrl.messages.length;
+                let count = homeCtrl.room[getRoomIndex(room_id)].messages.length;
                 let messageObj = {
                     _id: (count+1),
                     authorId: user.user.id,
-                    roomId: 124,
+                    roomId: room_id,
                     text: userMessage,
                     time: logTime.toString()
                 };
 
                 console.log(messageObj);
-                homeCtrl.messages.push(messageObj);
+                homeCtrl.room[getRoomIndex(room_id)].messages.push(messageObj);
 
                 if(socket){
                     console.log('this is a test');
