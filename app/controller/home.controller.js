@@ -5,6 +5,7 @@ app.controller('HomeController',[
     '$scope', 'AuthService',
     function ($scope, AuthService) {
         let homeCtrl = this;
+        let months = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
         //get current user object
         let user = AuthService.getUser();
@@ -38,6 +39,18 @@ app.controller('HomeController',[
                     };
                 }
                 homeCtrl.allusers = userList;
+                let index = 1;
+                homeCtrl.users = [];
+                Object.keys(homeCtrl.allusers)
+                    .forEach(function (key) {
+                        homeCtrl.users.push({
+                            _id: index,
+                            imageUrl: 'https://robohash.org/aa!',
+                            username: homeCtrl.allusers[key].username,
+                            fullname: homeCtrl.allusers[key].name
+                        });
+                        index = index + 1;
+                    });
             }catch (err){
                 console.log('An error occurs while parsing user object, [user: ' + msg + ']')
             }
@@ -61,6 +74,8 @@ app.controller('HomeController',[
 
         homeCtrl.allusers = [];
 
+
+
         homeCtrl.createMessage = function () {
             if(typeof homeCtrl.newMessage!=='undefined' &&
                 homeCtrl.newMessage !==''){
@@ -69,13 +84,19 @@ app.controller('HomeController',[
                 console.log('Should sent message: "' + userMessage + '"');
                 homeCtrl.newMessage = '';
 
+                let currentDate = new Date();
+                let logTime = months[currentDate.getMonth()] + " " +
+                    currentDate.getDate() + ", " +
+                    currentDate.getHours() + ":" +
+                    currentDate.getMinutes();
+
                 let count = homeCtrl.messages.length;
                 let messageObj = {
                     _id: (count+1),
                     authorId: user.user.id,
                     roomId: 124,
                     text: userMessage,
-                    time: 'Aug 3, 20:21'
+                    time: logTime.toString()
                 };
 
                 console.log(messageObj);

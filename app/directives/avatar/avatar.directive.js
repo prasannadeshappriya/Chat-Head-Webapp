@@ -18,17 +18,13 @@
           scope.contentUrl = "";
           var key = "###";
           var baseUrl = ["directives/avatar/", key, ".avatar.directive.tmpl.html"].join("");
-          console.log(scope.user);
           if(scope.user.imageUrl){
-            scope.contentUrl = baseUrl.replace(key, "filled");
+              scope.contentUrl = baseUrl.replace(key, "filled");
           }else{
-            scope.contentUrl = baseUrl.replace(key, "anonymous");
+              scope.contentUrl = baseUrl.replace(key, "anonymous");
           }
-          console.log(scope.contentUrl);
         }
-
     };
     return directive;
   }
-
 })();
