@@ -7,8 +7,12 @@ var bodyParser = require('body-parser');
 
 var index = require('./server/routes/index');
 var users = require('./server/routes/users');
+var cors = require('cors');
 
 var app = express();
+
+//Cross domain server access
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, '/app/views'));

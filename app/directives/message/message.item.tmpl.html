@@ -1,0 +1,14 @@
+<md-list-item class="contact-item md-2-line selected" ng-if="messageCtrl.author">
+  <avatar user="messageCtrl.author" class="md-avatar message-avatar">d</avatar>
+  <div class="md-list-item-text compact">
+    <p style="text-align: right;">
+      <small><strong>{{messageCtrl.author.username}}</strong>, {{ messageCtrl.message.time}}</small>
+    </p>
+    <div class="message-content">
+      {{messageCtrl.message.text}}
+      <ng-embed
+        embed-data="Hi My name is prasanna" embed-options="$root.embedOptions"></ng-embed>
+    </div>
+  </div>
+</md-list-item>
+
