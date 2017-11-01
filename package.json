@@ -21,6 +21,8 @@
     "passport-jwt": "^3.0.0",
     "password-hash": "^1.2.2",
     "password-validator": "^4.0.0",
+    "random-int": "^1.0.0",
+    "random-number": "0.0.9",
     "sequelize": "^4.11.0",
     "sequelize-cli": "^3.0.0",
     "serve-favicon": "~2.4.2",

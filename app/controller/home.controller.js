@@ -28,6 +28,12 @@ app.controller('HomeController',[
             }
         });
 
+        socket.emit('get_room_data', JSON.stringify(user.user));
+        socket.on('sync_room_data', function (msg) {
+            let data = JSON.parse(msg);
+            console.log(data)
+        });
+
         socket.on('room_update', function (msg) {
             try{
                 homeCtrl.roomAll = JSON.parse(msg);
@@ -40,9 +46,22 @@ app.controller('HomeController',[
         socket.on('room_create', function (msg) {
             console.log(msg);
             console.log('test');
+
+            let arrRooms = JSON.parse(msg);
             try{
                 homeCtrl.roomAll = [];
-                homeCtrl.roomAll = JSON.parse(msg);
+                homeCtrl.roomAll = arrRooms.rooms;
+
+                console.log(arrRooms);
+                let con = false;
+                for(let i=0; i<arrRooms.ret.room.users.length; i++){
+                    if(arrRooms.ret.room.users[i]._userID===user.user.id){
+                        con = true;
+                        break;
+                    }
+                }
+                if (con){homeCtrl.room.push(arrRooms.ret.room);}
+                console.log(homeCtrl.room);
                 $scope.$apply();
             }catch (err){
                 console.log('An error occurs while parsing the rooms, [msg: ' + msg + ']')
@@ -79,22 +98,103 @@ app.controller('HomeController',[
             }
         });
 
-        homeCtrl.createNewRoom = function () {
+        homeCtrl.goToRoom = function (roomDetails) {
             console.log(user);
-            let newRoom = {
-                name: 'movies',
-                roomId: 245,
-                users: [{
-                    _id: 1,
-                    fullname: user.user.first_name + ' ' + user.user.last_name,
-                    imageUrl: 'https://robohash.org/aa!',
-                    username: user.user.email
-                }],
-                messages:[]
-            };
-            homeCtrl.room.push(newRoom);
-            socket.emit('room_create',JSON.stringify(newRoom));
+            console.log(homeCtrl.room);
+            let con = true;
+            for(let i=0; i<homeCtrl.room.length; i++){
+                let item = homeCtrl.room[i];
+                if(item.name===roomDetails.name){
+                    let room_users = homeCtrl.room[i].users;
+                    con = true;
+                    for(let j=0; j<room_users.length; j++){
+                        if(room_users[j]._userID===user.user.id){
+                            con = false;}
+                    }
+                    if(con){
+                        homeCtrl.room[i].users.push({
+                            _id: (homeCtrl.room[i].users.length + 1),
+                            _userID: user.user.id,
+                            fullname: user.user.first_name + ' ' + user.user.last_name,
+                            imageUrl: 'https://robohash.org/aa!',
+                            username: user.user.email,
+                            isAdmin: false
+                        });
+                        break;
+                    }
+                }
+            }
+            if (con) {
+                let data = {user: user, data: roomDetails};
+                socket.emit('add_user_to_room', JSON.stringify(data));
+            }else {
+                console.log('User already in that room');
+            }
         };
+
+        socket.on('add_user_to_room', function (details) {
+            let j_details = JSON.parse(details);
+            let room_users = j_details.users;
+            let con = false;
+            for(let i=0; i< room_users.length; i++){
+                let room_user = room_users[i];
+                if(room_user._userID===user.user.id){
+                    con = true;
+                    break;
+                }
+            }
+            console.log(con);
+            console.log(homeCtrl.room);
+            if(con){
+                for(let i=0; i< homeCtrl.room.length; i++){
+                    if(homeCtrl.room[i].name===j_details.name){
+                        homeCtrl.room.splice(i,1);
+                        homeCtrl.room.push(j_details);
+                        con = false; $scope.$apply(); break;
+                    }
+                }
+            }
+            if(con){
+                homeCtrl.room.push(j_details);
+                con = false; $scope.$apply();
+            }
+            console.log(homeCtrl.room);
+        });
+
+        homeCtrl.invalid_room_name = false;
+        homeCtrl.room_duplicate = false;
+
+        homeCtrl.createNewRoom = function () {
+            homeCtrl.invalid_room_name = false;
+            homeCtrl.room_duplicate = false;
+            if (homeCtrl.roomName==='' ||
+                typeof homeCtrl.roomName==='undefined'){
+                homeCtrl.invalid_room_name = true;
+            }else {
+                console.log(user);
+                let newRoom = { user:user.user.id, room: {
+                    name: homeCtrl.roomName,
+                    roomId: -1,
+                    users: [{
+                        _id: 1,
+                        _userID: user.user.id,
+                        fullname: user.user.first_name + ' ' + user.user.last_name,
+                        imageUrl: 'https://robohash.org/aa!',
+                        username: user.user.email,
+                        isAdmin: true
+                    }],
+                    messages: []
+                }};
+                socket.emit('room_create', JSON.stringify(newRoom));
+            }
+        };
+
+        socket.on('room_duplicate', function (user_id) {
+            console.log(details);
+            if(user.user.id===user_id){
+                homeCtrl.room_duplicate = true;
+            }
+        });
 
         //User input message
         homeCtrl.newMessage = '';

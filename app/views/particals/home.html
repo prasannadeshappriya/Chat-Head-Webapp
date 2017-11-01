@@ -1,4 +1,25 @@
 <div class="container" ng-controller="HomeController as homeCtrl">
+    <div class="modal fade" id="createRoom">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Create new room</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="roomName" class="control-label">Room Name:</label>
+                        <input type="text" class="form-control" id="roomName" ng-model="homeCtrl.roomName">
+                    </div>
+                    <p class="text-info" style="float: right; color: red" ng-show="homeCtrl.invalid_room_name">Invalid Room Name</p>
+                    <p class="text-info" style="float: right; color: red" ng-show="homeCtrl.room_duplicate">Room name is already taken</p>
+                </div>
+                <div class="modal-footer" style="margin-top: 5%">
+                    <button type="button" class="btn btn-success" style="width: 100px" ng-click="homeCtrl.createNewRoom()">Create</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" style="width: 100px">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div ng-include="app/directives/avatar/filled.avatar.directive.tmpl.html"></div>
     <md-content>
         <md-tabs md-dynamic-height="" md-border-bottom="">
@@ -7,10 +28,11 @@
                     <h1 class="md-display-2">Tab One</h1>
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue. Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies mi.</p>
                     <div class="list-group col-xs-6 col-xs-offset-3" style="margin-top: 10px">
-                        <a href="#" class="list-group-item" ng-repeat="item in homeCtrl.roomAll">{{item.name}}</a>
+                        <a href="" class="list-group-item" ng-repeat="item in homeCtrl.roomAll" ng-click="homeCtrl.goToRoom(item)">{{item.name}}</a>
                     </div>
                     <div class="col-xs-12">
-                        <input type="button" value="Create new Room" class="btn btn-success center-block" ng-click="homeCtrl.createNewRoom()">
+                        <input type="button" value="Create new Room" class="btn btn-success center-block"
+                               data-target="#createRoom" data-toggle="modal">
                     </div>
                 </md-content>
             </md-tab>
