@@ -83,21 +83,34 @@ module.exports = [
                 console.log('-----------------------');
             });
 
+            socket.on('store_messages', async function(message_data){
+                let data = JSON.parse(message_data);
+                for(let i=0; i<rooms.length; i++){
+                    if(rooms[i].roomId===data.roomId){
+                        rooms[i].messages.push(data.messageObj);
+                    }
+                }
+            });
+
             socket.on('get_room_data', async function (user) {
                 console.log(rooms);
-                io.sockets.emit('sync_room_data', JSON.stringify(rooms));
+                //io.sockets.emit('sync_room_data', JSON.stringify(rooms));
                 let user_id = JSON.parse(user).id;
                 console.log(user_id);
                 let ret = [];
                 for(let i=0; i<rooms.length; i++){
                     for(let j=0; j<rooms[i].users.length; j++){
                         if(rooms[i].users[j]._userID===user_id){
-                            ret.push(rooms[i].users[j]);
+                            ret.push(rooms[i]);
                             break;
                         }
                     }
                 }
-                io.sockets.emit('sync_room_data', JSON.stringify(ret));
+                let data = {
+                    data: ret,
+                    user_id: user_id
+                };
+                io.sockets.emit('sync_room_data', JSON.stringify(data));
             });
 
             socket.on('room_create', async function(msg){

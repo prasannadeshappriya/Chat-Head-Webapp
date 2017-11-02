@@ -31,7 +31,10 @@ app.controller('HomeController',[
         socket.emit('get_room_data', JSON.stringify(user.user));
         socket.on('sync_room_data', function (msg) {
             let data = JSON.parse(msg);
-            console.log(data)
+            if(user.user.id===data.user_id) {
+                homeCtrl.room = data.data;
+                $scope.$apply();
+            }
         });
 
         socket.on('room_update', function (msg) {
@@ -148,8 +151,13 @@ app.controller('HomeController',[
             if(con){
                 for(let i=0; i< homeCtrl.room.length; i++){
                     if(homeCtrl.room[i].name===j_details.name){
-                        homeCtrl.room.splice(i,1);
-                        homeCtrl.room.push(j_details);
+                        console.log('-----------1-----------');
+                        console.log(homeCtrl.room);
+                        console.log('-----------------------');
+                        homeCtrl.room[i].users = j_details.users;
+                        console.log('-----------2-----------');
+                        console.log(homeCtrl.room);
+                        console.log('-----------------------');
                         con = false; $scope.$apply(); break;
                     }
                 }
@@ -206,8 +214,7 @@ app.controller('HomeController',[
 
         //Get all rooms
         homeCtrl.room = [
-            {name: 'public Room', roomId: 1, users: [], messages: []},
-            {name: 'prasanna', roomId: 126, users: [], messages: []}
+            {name: 'public Room', roomId: 1, users: [], messages: []}
         ];
 
         //Store all messages
@@ -247,10 +254,14 @@ app.controller('HomeController',[
                 };
 
                 console.log(messageObj);
+                socket.emit('store_messages', JSON.stringify({
+                    roomId: room_id,
+                    messageObj: messageObj
+                }));
+
                 homeCtrl.room[getRoomIndex(room_id)].messages.push(messageObj);
 
                 if(socket){
-                    console.log('this is a test');
                     socket.emit('message',JSON.stringify(messageObj));
                 }
             }
